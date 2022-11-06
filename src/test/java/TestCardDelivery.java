@@ -5,35 +5,36 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.openqa.selenium.Keys;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static com.codeborne.selenide.Selenide.*;
 
 public class TestCardDelivery {
+    public String generateDate(int days) {
+        return LocalDate.now().plusDays(days).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
+
     @BeforeEach
-    void openBrowser(){
+    void openBrowser() {
         open("http://0.0.0.0:9999");
-       Configuration.holdBrowserOpen=true;
+        Configuration.holdBrowserOpen = true;
     }
 
     @Test
     void checkedCard() {
-       // $("a[data-test-id='Город']").click();
-       // $("input[@type='Город']").setValue("Москва");
-            $("[placeholder=Город]").setValue("Москва");
-            String inputDate = LocalDate.now().plusDays(3).format(DateTimeFormatter.ofPattern("dd.MM.uuuu"));
-            SelenideElement data = $("[data-test-id=date]");
-            data.$("[value]").doubleClick().sendKeys(Keys.BACK_SPACE);
-            data.$("[placeholder]").setValue(inputDate);
-            $("[data-test-id=name].input_type_text .input__control").setValue("Елена Прекрасная");
-            $("[data-test-id=phone]").$("[name=phone]").setValue("+71112223344");
-            $("[class=checkbox__box]").click();
-            $$("[class=button__text]").find(Condition.exactText("Забронировать")).click();
-            $("[class=notification__content]").waitUntil(Condition.visible, 15000)
-                    .shouldHave(Condition.exactTextCaseSensitive("Встреча успешно забронирована на " + inputDate));
-
-        }
-
+        String planningDate = generateDate(5);
+        $("[data-test-id='city'] input").setValue("Москва");
+        $x("//input[@placeholder='Дата встречи']").sendKeys(Keys.chord(Keys.SHIFT, Keys.HOME), Keys.BACK_SPACE);
+        $x("//input[@placeholder='Дата встречи']").setValue(planningDate);
+        $x("//input[@name='name']").setValue("Василиса Прекрасная");
+        $x("//input[@name='phone']").setValue("+71112223344");
+        $("[data-test-id='agreement']").click();
+        $x("//span[@class='button__text']").click();
+        $x("//*[contains(text(),'Успешно!')]").shouldBe(Condition.visible, Duration.ofSeconds(15));
+        $(".notification__content").shouldHave(Condition.text("Встреча успешно забронирована на " + planningDate), Duration.ofSeconds(15)).shouldBe(Condition.visible);
     }
+
+}
 
