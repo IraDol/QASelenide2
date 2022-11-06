@@ -13,7 +13,7 @@ import static com.codeborne.selenide.Selenide.*;
 public class TestCardDelivery {
     @BeforeEach
     void openBrowser(){
-        open("http://localhost9999/");
+        open("http://0.0.0.0:9999");
        Configuration.holdBrowserOpen=true;
     }
 
